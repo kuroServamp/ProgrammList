@@ -7,7 +7,7 @@ class Program {
         ListPrograms list = new ListPrograms();
 
             Console.WriteLine("Deleting old data");
-            list.DeleteOldData(); 
+        list.DeleteOldData();
             string keyname1 = "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstal";
             Console.WriteLine("Searching for 32 bit");
             list.createList(keyname1, "x86");

@@ -1,23 +1,15 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using ProgrammList.sql;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using static Mysqlx.Expect.Open.Types.Condition.Types;
-
 namespace ProgrammList.ListPrograms {
     internal class ListPrograms {
 
         string prgm_path = Directory.GetCurrentDirectory() + "\\";
         string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate"};
-        Mysql sql;
+        Mssql sql;
 
-        internal ListPrograms() { 
-             sql = new Mysql();
+        internal ListPrograms() {
+            sql = new Mssql();
         }
 
         internal void DeleteOldData() {
