@@ -20,7 +20,7 @@ namespace ProgrammList.sql {
             else if (sqlcon != null) {
                 sqlcon.Close();
             }
-            else if (sqlitecon != null {
+            else if (sqlitecon != null) {
                 sqlitecon.Close();
             }
         }

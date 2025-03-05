@@ -1,7 +1,7 @@
 ﻿using System.Configuration;
 
 namespace ProgrammList.ConfigManager {
-    internal class ConfigManager {
+    public class ConfigManager {
         public static string GetSetting(string key) {
             return ConfigurationManager.AppSettings[key];
         }

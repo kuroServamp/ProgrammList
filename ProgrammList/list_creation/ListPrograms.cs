@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using ProgrammList.sql;
 using System.Net;
 
@@ -8,7 +7,7 @@ namespace ProgrammList.ListPrograms {
 
         string prgm_path = Directory.GetCurrentDirectory() + "\\";
         string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate" };
-        private SqlBase sql;
+        private SqlBase sql = null;
 
         internal ListPrograms(string sqlType) {
             if (sqlType == null) {
@@ -18,7 +17,6 @@ namespace ProgrammList.ListPrograms {
                 Console.WriteLine("MSSQL");
                 Console.WriteLine("SQLITE");
                 throw new ArgumentNullException();
-                System.Environment.Exit(13);
             }
 
             if (sqlType.Equals("MYSQL", StringComparison.OrdinalIgnoreCase) || sqlType.Equals("MARIADB", StringComparison.OrdinalIgnoreCase)) {
@@ -28,10 +26,7 @@ namespace ProgrammList.ListPrograms {
                 sql = new Mssql();
             }
             else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase)) {
-                string filename = ConfigManager.GetSetting("Filename");
-                if (!filename.IsNullOrEmpty()) {
-                    sql = new Sqlite(prgm_path, filename);
-                }
+                sql = new Sqlite(prgm_path);
             }
         }
 

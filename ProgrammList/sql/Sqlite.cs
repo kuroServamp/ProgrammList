@@ -1,16 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
+using System.Configuration;
 
 namespace ProgrammList.sql {
     public class Sqlite : SqlBaseAbstract {
 
         string filename;
 
-        public Sqlite(string prm_path, string file) {
-
-            string prgm_path = prm_path + filename;
-            filename = file;
-
-            sqlitecon = new SqliteConnection("Data Source=" + prm_path + filename);
+        public Sqlite(string prm_path) {
+            sqlitecon = new SqliteConnection("Data Source=" + prm_path + ConfigurationManager.AppSettings["filename"]);
             sqlitecon.Open();
         }
 

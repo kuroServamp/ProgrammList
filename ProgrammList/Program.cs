@@ -1,10 +1,11 @@
-﻿using ProgrammList.ListPrograms;
+﻿using ProgrammList.ConfigManager;
+using ProgrammList.ListPrograms;
 
 class Program {
     public static void Main(string[] args) {
 
-
-        ListPrograms list = new ListPrograms();
+        string dbType = ConfigManager.GetSetting("DB_Type");
+        ListPrograms list = new ListPrograms(dbType);
 
         Console.WriteLine("Deleting old data");
         list.DeleteOldData();
