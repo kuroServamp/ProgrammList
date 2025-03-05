@@ -1,8 +1,6 @@
 ﻿
 
 using Microsoft.Data.SqlClient;
-using MySql.Data.MySqlClient;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProgrammList.sql {
     internal class Mssql {
@@ -66,10 +64,22 @@ namespace ProgrammList.sql {
         internal void checkTableExists() {
             Open();
             var command = Connection.CreateCommand();
-            command.CommandText = "IF OBJECT_ID('list', 'U') IS NOT NULL BEGIN PRINT '0' END ELSE BEGIN PRINT '1' END";
+            command.CommandText = "select case when exists (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'prgmlist' AND  TABLE_NAME = 'list') then 1 else 0 end";
             var returncode = command.ExecuteScalar();
-            if (returncode != null && returncode.ToString() == "1") {
-                Console.WriteLine("Creating table...");
+            if (returncode != null) {
+                int rc;
+                bool convertingResult = Int32.TryParse(returncode.ToString(), out rc);
+
+                if (!convertingResult) {
+                    throw new FormatException();
+                }
+
+                if (rc > 0) {
+                    Console.WriteLine("Creating table...");
+                }
+                else {
+                    return;
+                }
             }
             var cols = string.Join(" VARCHAR(255),", valuenames);
             cols = cols + " Varchar(255)";
