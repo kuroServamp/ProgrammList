@@ -1,42 +1,47 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Data.Sqlite;
 
 namespace ProgrammList.sql {
+    public class Sqlite : SqlBaseAbstract {
 
+        string filename;
 
-    internal class Mysql : SqlBaseAbstract {
+        public Sqlite(string prm_path, string file) {
 
+            string prgm_path = prm_path + filename;
+            filename = file;
 
-        public Boolean GetSingleLine(string pcid, string program, string version) {
-            Open(DB.MYSQL);
-            var command = mysqlcon.CreateCommand();
+            sqlitecon = new SqliteConnection("Data Source=" + prm_path + filename);
+            sqlitecon.Open();
+        }
+
+        public bool GetSingleLine(string pcid, string program, string version) {
+            var command = sqlitecon.CreateCommand();
             command.CommandText = @"SELECT * FROM list where PCID like "
                 + pcid + " and  DisplayName like "
                 + program + " and  DisplayVersion like " + version + ";";
-            var result = command.ExecuteReader().Read();
 
-            Close();
+
+            bool result = command.ExecuteReader().Read();
+
             return result;
         }
 
         public void CheckTableExists() {
-            Open(DB.MYSQL);
-            var command = mysqlcon.CreateCommand();
-            command.CommandText = @"SHOW TABLES LIKE 'list';";
+            var command = sqlitecon.CreateCommand();
+            command.CommandText = @"SELECT name FROM sqlite_master WHERE type='table' AND name='list';";
             var name = command.ExecuteScalar();
             if (name != null && name.ToString() == "list") {
                 return;
             }
-            var cols = string.Join(" VARCHAR(255),", valuenames);
-            cols = cols + " Varchar(255)";
+            var cols = string.Join(" VARCHAR,", valuenames);
+            cols = cols + " Varchar";
             command.CommandText = "CREATE TABLE list (" + cols + ")";
             command.ExecuteNonQuery();
-            Close();
         }
 
 
         public void InsertData(Dictionary<string, string> valuesqlCommand) {
-            Open(DB.MYSQL);
-            var transaction = mysqlcon.BeginTransaction();
+            var transaction = sqlitecon.BeginTransaction();
 
             string result = "";
             for (int i = 0; i < valuenames.Length; i++) {
@@ -51,26 +56,35 @@ namespace ProgrammList.sql {
             var cols = String.Join(",", valuenames);
 
             string sqlCommand = "INSERT INTO list(" + cols + ")" + "VALUES(" + result + ")";
-
-            var command = new MySqlCommand(sqlCommand, mysqlcon, transaction);
+            SqliteConnection con;
+            var command = new SqliteCommand(sqlCommand, sqlitecon, transaction);
+            Console.WriteLine(sqlCommand);
             command.ExecuteNonQuery();
             transaction.Commit();
-            Console.WriteLine(sqlCommand);
-            Close();
         }
 
         public void InsertOrUpdateData(Dictionary<string, string> value) {
             if (GetSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
+
+                Console.WriteLine("Update");
                 UpdateData(value);
             }
             else {
+
+                Console.WriteLine("Insert");
                 InsertData(value);
             }
         }
 
+        public void DeleteOldData(string hostname) {
+            var command = sqlitecon.CreateCommand();
+            string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
+            command.CommandText = sqlCommand;
+            command.ExecuteReader();
+        }
+
         public void UpdateData(Dictionary<string, string> value) {
-            Open(DB.MYSQL);
-            var transaction = mysqlcon.BeginTransaction();
+            var transaction = sqlitecon.BeginTransaction();
             string sqlCommand = @"Update list ";
 
             string result = "set ";
@@ -88,26 +102,29 @@ namespace ProgrammList.sql {
                  " and  DisplayVersion like " + value.GetValueOrDefault("DisplayVersion");
 
 
-            var command = new MySqlCommand(sqlCommand, mysqlcon, transaction);
+            var command = new SqliteCommand(sqlCommand, sqlitecon, transaction);
             for (int i = 0; i < valuenames.Length; i++) {
                 if (valuenames[i] != "PCID") {
                     command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
                 }
             }
-            Console.WriteLine(sqlCommand);
+
+            Console.WriteLine(command.CommandText);
             command.ExecuteNonQuery();
             transaction.Commit();
-            Close();
         }
 
+        public void DeleteData(string id) {
+            var command = sqlitecon.CreateCommand();
+            command.CommandText = @"SELECT name FROM user WHERE id = $id";
+            command.Parameters.AddWithValue("$id", id);
 
-        public void DeleteOldData(string hostname) {
-            Open(DB.MYSQL);
-            var command = mysqlcon.CreateCommand();
-            string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
-            command.CommandText = sqlCommand;
-            command.ExecuteReader();
-            Close();
+            using (var reader = command.ExecuteReader()) {
+                while (reader.Read()) {
+                    var name = reader.GetString(0);
+                }
+            }
         }
+
     }
 }

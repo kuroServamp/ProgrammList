@@ -3,13 +3,9 @@
 using Microsoft.Data.SqlClient;
 
 namespace ProgrammList.sql {
-    internal class Mssql {
-        string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
+    public class Mssql : SqlBaseAbstract {
 
-        public SqlConnection Connection;
-        string connstring;
-
-        //private static DbConnection instance;
+        //private static Dbconnection instance;
         public Mssql() {
             var builder = new SqlConnectionStringBuilder {
                 DataSource = "localhost",
@@ -22,24 +18,9 @@ namespace ProgrammList.sql {
             connstring = builder.ToString();
         }
 
-        public void Open() {
-            Connection = new SqlConnection(connstring);
-            try {
-                Connection.Open();
-            }
-            catch (Exception ex) {
-                Console.Write(ex.ToString());
-            }
-        }
-
-        public void Close() {
-            Connection.Close();
-        }
-
-
-        internal void getAllData() {
-            Open();
-            var command = Connection.CreateCommand();
+        public void GetAllData() {
+            Open(DB.MSSQL);
+            var command = sqlcon.CreateCommand();
             command.CommandText = @"SELECT * FROM list";
 
             using (var reader = command.ExecuteReader()) {
@@ -49,9 +30,9 @@ namespace ProgrammList.sql {
             }
             Close();
         }
-        internal bool getSingleLine(string pcid, string program, string version) {
-            Open();
-            var command = Connection.CreateCommand();
+        public bool GetSingleLine(string pcid, string program, string version) {
+            Open(DB.MSSQL);
+            var command = sqlcon.CreateCommand();
             command.CommandText = @"SELECT * FROM list where PCID like "
                 + pcid + " and  DisplayName like "
                 + program + " and  DisplayVersion like " + version + ";";
@@ -61,9 +42,9 @@ namespace ProgrammList.sql {
             return result;
         }
 
-        internal void checkTableExists() {
-            Open();
-            var command = Connection.CreateCommand();
+        public void CheckTableExists() {
+            Open(DB.MSSQL);
+            var command = sqlcon.CreateCommand();
             command.CommandText = "select case when exists (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'prgmlist' AND  TABLE_NAME = 'list') then 1 else 0 end";
             var returncode = command.ExecuteScalar();
             if (returncode != null) {
@@ -89,9 +70,9 @@ namespace ProgrammList.sql {
         }
 
 
-        internal void InsertData(Dictionary<string, string> valuesqlCommand) {
-            Open();
-            var transaction = Connection.BeginTransaction();
+        public void InsertData(Dictionary<string, string> valuesqlCommand) {
+            Open(DB.MSSQL);
+            var transaction = sqlcon.BeginTransaction();
 
             string result = "";
             for (int i = 0; i < valuenames.Length; i++) {
@@ -107,15 +88,15 @@ namespace ProgrammList.sql {
 
             string sqlCommand = "INSERT INTO list(" + cols + ")" + "VALUES(" + result + ")";
 
-            var command = new SqlCommand(sqlCommand, Connection, transaction);
+            var command = new SqlCommand(sqlCommand, sqlcon, transaction);
             command.ExecuteNonQuery();
             transaction.Commit();
             Console.WriteLine(sqlCommand);
             Close();
         }
 
-        internal void InsertOrUpdateData(Dictionary<string, string> value) {
-            if (getSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
+        public void InsertOrUpdateData(Dictionary<string, string> value) {
+            if (GetSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
                 UpdateData(value);
             }
             else {
@@ -123,18 +104,18 @@ namespace ProgrammList.sql {
             }
         }
 
-        internal void deleteOldData(string hostname) {
-            Open();
-            var command = Connection.CreateCommand();
+        public void DeleteOldData(string hostname) {
+            Open(DB.MSSQL);
+            var command = sqlcon.CreateCommand();
             string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
             command.CommandText = sqlCommand;
             command.ExecuteReader();
             Close();
         }
 
-        internal void UpdateData(Dictionary<string, string> value) {
-            Open();
-            var transaction = Connection.BeginTransaction();
+        public void UpdateData(Dictionary<string, string> value) {
+            Open(DB.MSSQL);
+            var transaction = sqlcon.BeginTransaction();
             string sqlCommand = @"Update list ";
 
             string result = "set ";
@@ -152,7 +133,7 @@ namespace ProgrammList.sql {
                  " and  DisplayVersion like " + value.GetValueOrDefault("DisplayVersion");
 
 
-            var command = new SqlCommand(sqlCommand, Connection, transaction);
+            var command = new SqlCommand(sqlCommand, sqlcon, transaction);
             for (int i = 0; i < valuenames.Length; i++) {
                 if (valuenames[i] != "PCID") {
                     command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
@@ -161,20 +142,6 @@ namespace ProgrammList.sql {
             Console.WriteLine(sqlCommand);
             command.ExecuteNonQuery();
             transaction.Commit();
-            Close();
-        }
-
-        internal void DeleteData(string id) {
-            Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = @"SELECT name FROM user WHERE id = $id";
-            command.Parameters.AddWithValue("$id", id);
-
-            using (var reader = command.ExecuteReader()) {
-                while (reader.Read()) {
-                    var name = reader.GetString(0);
-                }
-            }
             Close();
         }
     }

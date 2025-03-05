@@ -1,20 +1,43 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using ProgrammList.sql;
 using System.Net;
+
 namespace ProgrammList.ListPrograms {
     internal class ListPrograms {
 
         string prgm_path = Directory.GetCurrentDirectory() + "\\";
-        string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate"};
-        Mssql sql;
+        string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate" };
+        private SqlBase sql;
 
-        internal ListPrograms() {
-            sql = new Mssql();
+        internal ListPrograms(string sqlType) {
+            if (sqlType == null) {
+                Console.WriteLine("SQL Database not defined in app.conf, allowed types:");
+                Console.WriteLine("MYSQL");
+                Console.WriteLine("MARIADB");
+                Console.WriteLine("MSSQL");
+                Console.WriteLine("SQLITE");
+                throw new ArgumentNullException();
+                System.Environment.Exit(13);
+            }
+
+            if (sqlType.Equals("MYSQL", StringComparison.OrdinalIgnoreCase) || sqlType.Equals("MARIADB", StringComparison.OrdinalIgnoreCase)) {
+                sql = new Mysql();
+            }
+            else if (sqlType.Equals("MSSQL", StringComparison.OrdinalIgnoreCase)) {
+                sql = new Mssql();
+            }
+            else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase)) {
+                string filename = ConfigManager.GetSetting("Filename");
+                if (!filename.IsNullOrEmpty()) {
+                    sql = new Sqlite(prgm_path, filename);
+                }
+            }
         }
 
         internal void DeleteOldData() {
-            sql.checkTableExists();
-            sql.deleteOldData(Dns.GetHostName());
+            sql.CheckTableExists();
+            sql.DeleteOldData(Dns.GetHostName());
         }
 
         internal void createList(string hkey, string bit) {
@@ -40,9 +63,9 @@ namespace ProgrammList.ListPrograms {
 
                     result = String.Join("", value.ToArray());
 
-                     if (result.EndsWith(",")) {
-                         result = result.Remove(result.Length - 1);
-                     }
+                    if (result.EndsWith(",")) {
+                        result = result.Remove(result.Length - 1);
+                    }
 
                     value.Add("PCID", "'" + Dns.GetHostName() + "'");
                     value.Add("update_date", "'" + DateTime.Now + "'");
