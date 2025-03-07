@@ -3,7 +3,13 @@
 using Microsoft.Data.SqlClient;
 
 namespace ProgrammList.sql {
-    public class Mssql : SqlBaseAbstract {
+    public class Mssql : SqlBase {
+
+        public string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
+        public string connstring = null;
+        string constring = null;
+
+        SqlConnection mssqlcon = null;
 
         //private static Dbconnection instance;
         public Mssql() {
@@ -15,12 +21,22 @@ namespace ProgrammList.sql {
                 TrustServerCertificate = true
             };
 
-            connstring = builder.ToString();
+            constring = builder.ToString();
+        }
+
+
+
+        public void Open() {
+            mssqlcon.Open();
+        }
+
+        public void Close() {
+            mssqlcon.Close();
         }
 
         public void GetAllData() {
-            Open(DB.MSSQL);
-            var command = sqlcon.CreateCommand();
+            Open();
+            var command = mssqlcon.CreateCommand();
             command.CommandText = @"SELECT * FROM list";
 
             using (var reader = command.ExecuteReader()) {
@@ -31,8 +47,8 @@ namespace ProgrammList.sql {
             Close();
         }
         public bool GetSingleLine(string pcid, string program, string version) {
-            Open(DB.MSSQL);
-            var command = sqlcon.CreateCommand();
+            Open();
+            var command = mssqlcon.CreateCommand();
             command.CommandText = @"SELECT * FROM list where PCID like "
                 + pcid + " and  DisplayName like "
                 + program + " and  DisplayVersion like " + version + ";";
@@ -43,8 +59,8 @@ namespace ProgrammList.sql {
         }
 
         public void CheckTableExists() {
-            Open(DB.MSSQL);
-            var command = sqlcon.CreateCommand();
+            Open();
+            var command = mssqlcon.CreateCommand();
             command.CommandText = "select case when exists (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'prgmlist' AND  TABLE_NAME = 'list') then 1 else 0 end";
             var returncode = command.ExecuteScalar();
             if (returncode != null) {
@@ -71,8 +87,8 @@ namespace ProgrammList.sql {
 
 
         public void InsertData(Dictionary<string, string> valuesqlCommand) {
-            Open(DB.MSSQL);
-            var transaction = sqlcon.BeginTransaction();
+            Open();
+            var transaction = mssqlcon.BeginTransaction();
 
             string result = "";
             for (int i = 0; i < valuenames.Length; i++) {
@@ -88,7 +104,7 @@ namespace ProgrammList.sql {
 
             string sqlCommand = "INSERT INTO list(" + cols + ")" + "VALUES(" + result + ")";
 
-            var command = new SqlCommand(sqlCommand, sqlcon, transaction);
+            var command = new SqlCommand(sqlCommand, mssqlcon, transaction);
             command.ExecuteNonQuery();
             transaction.Commit();
             Console.WriteLine(sqlCommand);
@@ -105,8 +121,8 @@ namespace ProgrammList.sql {
         }
 
         public void DeleteOldData(string hostname) {
-            Open(DB.MSSQL);
-            var command = sqlcon.CreateCommand();
+            Open();
+            var command = mssqlcon.CreateCommand();
             string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
             command.CommandText = sqlCommand;
             command.ExecuteReader();
@@ -114,8 +130,8 @@ namespace ProgrammList.sql {
         }
 
         public void UpdateData(Dictionary<string, string> value) {
-            Open(DB.MSSQL);
-            var transaction = sqlcon.BeginTransaction();
+            Open();
+            var transaction = mssqlcon.BeginTransaction();
             string sqlCommand = @"Update list ";
 
             string result = "set ";
@@ -133,7 +149,7 @@ namespace ProgrammList.sql {
                  " and  DisplayVersion like " + value.GetValueOrDefault("DisplayVersion");
 
 
-            var command = new SqlCommand(sqlCommand, sqlcon, transaction);
+            var command = new SqlCommand(sqlCommand, mssqlcon, transaction);
             for (int i = 0; i < valuenames.Length; i++) {
                 if (valuenames[i] != "PCID") {
                     command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));

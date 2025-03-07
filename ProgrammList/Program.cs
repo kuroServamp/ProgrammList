@@ -4,7 +4,7 @@ using ProgrammList.ListPrograms;
 class Program {
     public static void Main(string[] args) {
 
-        string dbType = ConfigManager.GetSetting("DB_Type");
+        string dbType = PrmListConfigManager.GetSetting("DB_Type");
         ListPrograms list = new ListPrograms(dbType);
 
         Console.WriteLine("Deleting old data");

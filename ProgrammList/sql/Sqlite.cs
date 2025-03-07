@@ -1,13 +1,43 @@
 ﻿using Microsoft.Data.Sqlite;
-using System.Configuration;
 
 namespace ProgrammList.sql {
-    public class Sqlite : SqlBaseAbstract {
+    public class Sqlite : SqlBase {
 
         string filename;
+        SqliteConnection sqlitecon;
+
+        public string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
+        public string connstring = null;
+
+        public Sqlite(string prm_path, string filename) {
+            sqlitecon = new SqliteConnection("Data Source=" + prm_path + filename);
+        }
+
+        public void Open() {
+            sqlitecon.Open();
+        }
+
+        public void Close() {
+            sqlitecon.Close();
+        }
+
+
+        public void Open(DB type) {
+            sqlitecon = new SqliteConnection(connstring);
+            sqlitecon.Open();
+        }
+
 
         public Sqlite(string prm_path) {
-            sqlitecon = new SqliteConnection("Data Source=" + prm_path + ConfigurationManager.AppSettings["filename"]);
+            string setting = ConfigManager.PrmListConfigManager.GetSetting("filename");
+            if (setting != null && setting != "") {
+                Console.WriteLine("using db filename " + setting);
+                sqlitecon = new SqliteConnection("Data Source=" + prm_path + setting);
+            }
+            else {
+                Console.WriteLine("reverting to default db, sqlite filename sqlite.db");
+                sqlitecon = new SqliteConnection("Data Source=" + prm_path + "sqlite.db");
+            }
             sqlitecon.Open();
         }
 

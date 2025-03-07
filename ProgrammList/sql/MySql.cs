@@ -3,11 +3,14 @@
 namespace ProgrammList.sql {
 
 
-    internal class Mysql : SqlBaseAbstract {
+    internal class Mysql {
+        public string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
+        public string connstring = null;
+        public MySqlConnection mysqlcon = null;
 
 
         public Boolean GetSingleLine(string pcid, string program, string version) {
-            Open(DB.MYSQL);
+            Open();
             var command = mysqlcon.CreateCommand();
             command.CommandText = @"SELECT * FROM list where PCID like "
                 + pcid + " and  DisplayName like "
@@ -18,8 +21,17 @@ namespace ProgrammList.sql {
             return result;
         }
 
+
+        public void Open() {
+            mysqlcon.Open();
+        }
+
+        public void Close() {
+            mysqlcon.Close();
+        }
+
         public void CheckTableExists() {
-            Open(DB.MYSQL);
+            Open();
             var command = mysqlcon.CreateCommand();
             command.CommandText = @"SHOW TABLES LIKE 'list';";
             var name = command.ExecuteScalar();
@@ -35,7 +47,7 @@ namespace ProgrammList.sql {
 
 
         public void InsertData(Dictionary<string, string> valuesqlCommand) {
-            Open(DB.MYSQL);
+            Open();
             var transaction = mysqlcon.BeginTransaction();
 
             string result = "";
@@ -69,7 +81,7 @@ namespace ProgrammList.sql {
         }
 
         public void UpdateData(Dictionary<string, string> value) {
-            Open(DB.MYSQL);
+            Open();
             var transaction = mysqlcon.BeginTransaction();
             string sqlCommand = @"Update list ";
 
@@ -102,7 +114,7 @@ namespace ProgrammList.sql {
 
 
         public void DeleteOldData(string hostname) {
-            Open(DB.MYSQL);
+            Open();
             var command = mysqlcon.CreateCommand();
             string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
             command.CommandText = sqlCommand;

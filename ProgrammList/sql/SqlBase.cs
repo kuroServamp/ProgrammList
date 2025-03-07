@@ -2,7 +2,8 @@
 
     interface SqlBase {
 
-
+        internal void Open();
+        internal void Close();
         internal bool GetSingleLine(string pcid, string program, string version);
 
         internal void CheckTableExists();

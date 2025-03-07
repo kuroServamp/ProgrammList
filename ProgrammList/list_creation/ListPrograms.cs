@@ -9,7 +9,7 @@ namespace ProgrammList.ListPrograms {
         string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate" };
         private SqlBase sql = null;
 
-        internal ListPrograms(string sqlType) {
+        internal ListPrograms(string sqlType, params string[] filename) {
             if (sqlType == null) {
                 Console.WriteLine("SQL Database not defined in app.conf, allowed types:");
                 Console.WriteLine("MYSQL");
@@ -25,8 +25,12 @@ namespace ProgrammList.ListPrograms {
             else if (sqlType.Equals("MSSQL", StringComparison.OrdinalIgnoreCase)) {
                 sql = new Mssql();
             }
-            else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase)) {
-                sql = new Sqlite(prgm_path);
+            else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase) && filename != null) {
+                sql = new Sqlite(prgm_path, filename[0]);
+            }
+            else {
+                // Default sqlite im gleichen ordner
+                sql = new Sqlite(prgm_path, "sqllite.db");
             }
         }
 
