@@ -1,19 +1,23 @@
-﻿namespace ProgrammList.sql {
+﻿using System.Collections.Generic;
+
+namespace ProgrammList.sql {
 
     interface SqlBase {
 
 
-        internal bool GetSingleLine(string pcid, string program, string version);
+        bool GetSingleLine(string pcid, string program, string version);
 
-        internal void CheckTableExists();
+        void CheckTableExists();
 
-        internal void InsertData(Dictionary<string, string> valuesqlCommand);
 
-        internal void InsertOrUpdateData(Dictionary<string, string> value);
 
-        internal void DeleteOldData(string hostname);
+        void InsertData(Dictionary<string, string> valuesqlCommand);
 
-        internal void UpdateData(Dictionary<string, string> value);
+
+        void InsertOrUpdateData(Dictionary<string, string> value);
+
+        void DeleteOldData(string hostname);
+        void UpdateData(Dictionary<string, string> value);
 
 
     }

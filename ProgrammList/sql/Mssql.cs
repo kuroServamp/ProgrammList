@@ -1,6 +1,8 @@
 ﻿
 
 using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
 
 namespace ProgrammList.sql {
     public class Mssql : SqlBaseAbstract {
@@ -46,6 +48,8 @@ namespace ProgrammList.sql {
             Open(DB.MSSQL);
             var command = sqlcon.CreateCommand();
             command.CommandText = "select case when exists (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'prgmlist' AND  TABLE_NAME = 'list') then 1 else 0 end";
+
+            Console.WriteLine("Executing: " + command.CommandText);
             var returncode = command.ExecuteScalar();
             if (returncode != null) {
                 int rc;
@@ -76,7 +80,9 @@ namespace ProgrammList.sql {
 
             string result = "";
             for (int i = 0; i < valuenames.Length; i++) {
-                result += valuesqlCommand.GetValueOrDefault(valuenames[i]);
+                string val = "";
+                valuesqlCommand.TryGetValue(valuenames[i], out val);
+                result += val;
 
                 if (i < valuenames.Length - 1) {
                     result += ",";
@@ -96,7 +102,13 @@ namespace ProgrammList.sql {
         }
 
         public void InsertOrUpdateData(Dictionary<string, string> value) {
-            if (GetSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
+            string pcid = "";
+            value.TryGetValue("PCID", out pcid);
+            string displayName = "";
+            value.TryGetValue("DisplayName", out displayName);
+            string displayVersion = "";
+            value.TryGetValue("DisplayVersion", out displayVersion);
+            if (GetSingleLine(pcid, displayName, displayVersion)) {
                 UpdateData(value);
             }
             else {
@@ -120,7 +132,9 @@ namespace ProgrammList.sql {
 
             string result = "set ";
             for (int i = 0; i < valuenames.Length; i++) {
-                result += valuenames[i] + " = " + value.GetValueOrDefault(valuenames[i]);
+                string val = "";
+                value.TryGetValue(valuenames[i], out val);
+                result += valuenames[i] + " = " + val;
 
                 if (i < valuenames.Length - 1) {
                     result += " ,";
@@ -128,15 +142,23 @@ namespace ProgrammList.sql {
             }
 
             sqlCommand = sqlCommand + result;
-            sqlCommand = sqlCommand + " WHERE PCID = " + value.GetValueOrDefault("PCID") +
-                 " and  DisplayName like " + value.GetValueOrDefault("DisplayName") +
-                 " and  DisplayVersion like " + value.GetValueOrDefault("DisplayVersion");
+            string pcid = "";
+            value.TryGetValue("PCID", out pcid);
+            string displayName = "";
+            value.TryGetValue("DisplayName", out displayName);
+            string displayVersion = "";
+            value.TryGetValue("DisplayVersion", out displayVersion);
+            sqlCommand = sqlCommand + " WHERE PCID = " + pcid +
+                 " and  DisplayName like " + displayName +
+                 " and  DisplayVersion like " + displayVersion;
 
 
             var command = new SqlCommand(sqlCommand, sqlcon, transaction);
             for (int i = 0; i < valuenames.Length; i++) {
                 if (valuenames[i] != "PCID") {
-                    command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
+                    string itemValue = "";
+                    value.TryGetValue(valuenames[i], out itemValue);
+                    command.Parameters.AddWithValue("$" + valuenames[i], itemValue);
                 }
             }
             Console.WriteLine(sqlCommand);

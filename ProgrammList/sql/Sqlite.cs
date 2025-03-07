@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 
 namespace ProgrammList.sql {
@@ -42,7 +44,8 @@ namespace ProgrammList.sql {
 
             string result = "";
             for (int i = 0; i < valuenames.Length; i++) {
-                result += valuesqlCommand.GetValueOrDefault(valuenames[i]);
+                string value = "";
+                result += valuesqlCommand.TryGetValue(valuenames[i], out value);
 
                 if (i < valuenames.Length - 1) {
                     result += ",";
@@ -61,7 +64,13 @@ namespace ProgrammList.sql {
         }
 
         public void InsertOrUpdateData(Dictionary<string, string> value) {
-            if (GetSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
+            string pcid = "";
+            string displayName = "";
+            string displayVersion = "";
+            value.TryGetValue("PCID", out pcid);
+            value.TryGetValue("DisplayName", out displayName);
+            value.TryGetValue("DisplayVersion", out displayVersion);
+            if (GetSingleLine(pcid, displayName, displayVersion)) {
 
                 Console.WriteLine("Update");
                 UpdateData(value);
@@ -86,7 +95,9 @@ namespace ProgrammList.sql {
 
             string result = "set ";
             for (int i = 0; i < valuenames.Length; i++) {
-                result += valuenames[i] + " = " + value.GetValueOrDefault(valuenames[i]);
+                string res = "";
+                value.TryGetValue(valuenames[i], out res);
+                result += valuenames[i] + " = " + res;
 
                 if (i < valuenames.Length - 1) {
                     result += " ,";
@@ -94,15 +105,23 @@ namespace ProgrammList.sql {
             }
 
             sqlCommand = sqlCommand + result;
-            sqlCommand = sqlCommand + " WHERE PCID = " + value.GetValueOrDefault("PCID") +
-                 " and  DisplayName like " + value.GetValueOrDefault("DisplayName") +
-                 " and  DisplayVersion like " + value.GetValueOrDefault("DisplayVersion");
+            string pcid = "";
+            value.TryGetValue("PCID", out pcid);
+            string displayName = "";
+            value.TryGetValue("DisplayName", out displayName);
+            string displayVersion = "";
+            value.TryGetValue("DisplayVersion", out displayVersion);
+            sqlCommand = sqlCommand + " WHERE PCID = " + pcid +
+                 " and  DisplayName like " + displayName +
+                 " and  DisplayVersion like " + displayVersion;
 
 
             var command = new SqliteCommand(sqlCommand, sqlitecon, transaction);
             for (int i = 0; i < valuenames.Length; i++) {
                 if (valuenames[i] != "PCID") {
-                    command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
+                    string itemValue = "";
+                    value.TryGetValue(valuenames[i], out itemValue);
+                    command.Parameters.AddWithValue("$" + valuenames[i], itemValue);
                 }
             }
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
 
 namespace ProgrammList.sql {
 
@@ -59,11 +61,15 @@ namespace ProgrammList.sql {
             }
         }
 
-        bool SqlBase.GetSingleLine(string pcid, string program, string version) {
+        void SqlBase.CheckTableExists() {
             throw new NotImplementedException();
         }
 
-        void SqlBase.CheckTableExists() {
+        void SqlBase.DeleteOldData(string hostname) {
+            throw new NotImplementedException();
+        }
+
+        bool SqlBase.GetSingleLine(string pcid, string program, string version) {
             throw new NotImplementedException();
         }
 
@@ -72,10 +78,6 @@ namespace ProgrammList.sql {
         }
 
         void SqlBase.InsertOrUpdateData(Dictionary<string, string> value) {
-            throw new NotImplementedException();
-        }
-
-        void SqlBase.DeleteOldData(string hostname) {
             throw new NotImplementedException();
         }
 

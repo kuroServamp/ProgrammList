@@ -1,15 +1,20 @@
 ﻿using Microsoft.Win32;
+using ProgrammList.ConfigManager;
 using ProgrammList.sql;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace ProgrammList.ListPrograms {
-    internal class ListPrograms {
+    public class ListPrograms {
 
         string prgm_path = Directory.GetCurrentDirectory() + "\\";
         string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate" };
         private SqlBase sql = null;
 
-        internal ListPrograms(string sqlType) {
+        public void init() {
+            string sqlType = PrmListConfigManager.GetSetting("DB_Type");
             if (sqlType == null) {
                 Console.WriteLine("SQL Database not defined in app.conf, allowed types:");
                 Console.WriteLine("MYSQL");
@@ -30,12 +35,12 @@ namespace ProgrammList.ListPrograms {
             }
         }
 
-        internal void DeleteOldData() {
+        public void DeleteOldData() {
             sql.CheckTableExists();
             sql.DeleteOldData(Dns.GetHostName());
         }
 
-        internal void createList(string hkey, string bit) {
+        public void createList(string hkey, string bit) {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(hkey);
             try {
                 if (key == null) {
@@ -56,11 +61,11 @@ namespace ProgrammList.ListPrograms {
                         count++;
                     }
 
-                    result = String.Join("", value.ToArray());
-
-                    if (result.EndsWith(",")) {
-                        result = result.Remove(result.Length - 1);
-                    }
+                    // result = String.Join("", value.ToArray());
+                    // 
+                    // if (result.EndsWith(",")) {
+                    //     result = result.Remove(result.Length - 1);
+                    // }
 
                     value.Add("PCID", "'" + Dns.GetHostName() + "'");
                     value.Add("update_date", "'" + DateTime.Now + "'");
