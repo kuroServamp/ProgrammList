@@ -1,6 +1,6 @@
 # ProgrammList (EN)
 
-A Program to create a list of programs installled on a system. You may add this program on a networkfolder to get more information form single clients that execute a script to invoke it and save the data to a centralised database.
+A Program to create a list of programs installled on a system. You may add this program on a networkfolder to get more information from single clients that execute a script to invoke it and save the data to a centralized database.
 
 Supported databases are MSSQL, Sqlite and MySql.
 
