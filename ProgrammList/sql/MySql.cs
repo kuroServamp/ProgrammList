@@ -8,6 +8,11 @@ namespace ProgrammList.sql {
         public string connstring = null;
         public MySqlConnection mysqlcon = null;
 
+        public Mysql() {
+            connstring = string.Format("Server={0}; database={1}; UID={2}; password={3}", "localhost", "programlist", "prgmlist", "XFdtYdXgahU3U1a73cs5");
+        }
+
+
 
         public Boolean GetSingleLine(string pcid, string program, string version) {
             Open();
@@ -23,6 +28,7 @@ namespace ProgrammList.sql {
 
 
         public void Open() {
+            mysqlcon = new MySqlConnection(connstring);
             mysqlcon.Open();
         }
 
@@ -33,7 +39,7 @@ namespace ProgrammList.sql {
         public void CheckTableExists() {
             Open();
             var command = mysqlcon.CreateCommand();
-            command.CommandText = @"SHOW TABLES LIKE 'list';";
+            command.CommandText = "SHOW TABLES LIKE 'list';";
             var name = command.ExecuteScalar();
             if (name != null && name.ToString() == "list") {
                 return;
