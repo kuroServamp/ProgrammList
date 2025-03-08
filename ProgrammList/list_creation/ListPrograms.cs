@@ -9,6 +9,7 @@ namespace ProgrammList.ListPrograms {
         string[] keyvaluenames = { "DisplayName", "DisplayVersion", "InstallDate" };
         private SqlBase sql = null;
 
+
         internal ListPrograms(string sqlType, params string[] filename) {
             if (sqlType == null) {
                 Console.WriteLine("SQL Database not defined in app.conf, allowed types:");
@@ -19,19 +20,26 @@ namespace ProgrammList.ListPrograms {
                 throw new ArgumentNullException();
             }
 
+            string sqlname = "";
             if (sqlType.Equals("MYSQL", StringComparison.OrdinalIgnoreCase) || sqlType.Equals("MARIADB", StringComparison.OrdinalIgnoreCase)) {
                 sql = new Mysql();
+                sqlname = "MySQL/MariaDB";
             }
             else if (sqlType.Equals("MSSQL", StringComparison.OrdinalIgnoreCase)) {
                 sql = new Mssql();
+                sqlname = "MSSQL";
             }
             else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase) && filename != null) {
                 sql = new Sqlite(prgm_path, filename[0]);
+                sqlname = "SQLITE";
             }
             else {
                 // Default sqlite im gleichen ordner
                 sql = new Sqlite(prgm_path, "sqllite.db");
+                sqlname = "fallback default SQLITE";
             }
+
+            Console.WriteLine();
         }
 
         internal void DeleteOldData() {

@@ -6,28 +6,32 @@ namespace ProgrammList.sql {
     public class Mssql : SqlBase {
 
         public string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
-        public string connstring = null;
-        string constring = null;
 
         SqlConnection mssqlcon = null;
+        SqlConnectionStringBuilder builder;
+
 
         //private static Dbconnection instance;
         public Mssql() {
-            var builder = new SqlConnectionStringBuilder {
+            builder = new SqlConnectionStringBuilder {
                 DataSource = "localhost",
                 UserID = "sa",
                 Password = "2677890E23",
                 InitialCatalog = "prgmlist",
                 TrustServerCertificate = true
             };
-
-            constring = builder.ToString();
         }
 
 
 
         public void Open() {
-            mssqlcon.Open();
+            try {
+                mssqlcon = new SqlConnection(builder.ConnectionString);
+                mssqlcon.Open();
+            }
+            catch (Exception ex) {
+                System.Environment.Exit(13);
+            }
         }
 
         public void Close() {
@@ -71,12 +75,7 @@ namespace ProgrammList.sql {
                     throw new FormatException();
                 }
 
-                if (rc > 0) {
-                    Console.WriteLine("Creating table...");
-                }
-                else {
-                    return;
-                }
+                return;
             }
             var cols = string.Join(" VARCHAR(255),", valuenames);
             cols = cols + " Varchar(255)";
@@ -107,7 +106,6 @@ namespace ProgrammList.sql {
             var command = new SqlCommand(sqlCommand, mssqlcon, transaction);
             command.ExecuteNonQuery();
             transaction.Commit();
-            Console.WriteLine(sqlCommand);
             Close();
         }
 
@@ -155,7 +153,6 @@ namespace ProgrammList.sql {
                     command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
                 }
             }
-            Console.WriteLine(sqlCommand);
             command.ExecuteNonQuery();
             transaction.Commit();
             Close();

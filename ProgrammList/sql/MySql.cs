@@ -3,7 +3,7 @@
 namespace ProgrammList.sql {
 
 
-    internal class Mysql {
+    internal class Mysql : SqlBase {
         public string[] valuenames = { "PCID", "DisplayName", "DisplayVersion", "InstallDate", "update_date", "APP_Architecture" };
         public string connstring = null;
         public MySqlConnection mysqlcon = null;
@@ -67,7 +67,6 @@ namespace ProgrammList.sql {
             var command = new MySqlCommand(sqlCommand, mysqlcon, transaction);
             command.ExecuteNonQuery();
             transaction.Commit();
-            Console.WriteLine(sqlCommand);
             Close();
         }
 
@@ -106,7 +105,7 @@ namespace ProgrammList.sql {
                     command.Parameters.AddWithValue("$" + valuenames[i], value.GetValueOrDefault(valuenames[i]));
                 }
             }
-            Console.WriteLine(sqlCommand);
+
             command.ExecuteNonQuery();
             transaction.Commit();
             Close();

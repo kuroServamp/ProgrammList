@@ -42,6 +42,7 @@ namespace ProgrammList.sql {
         }
 
         public bool GetSingleLine(string pcid, string program, string version) {
+            Open();
             var command = sqlitecon.CreateCommand();
             command.CommandText = @"SELECT * FROM list where PCID like "
                 + pcid + " and  DisplayName like "
@@ -49,11 +50,12 @@ namespace ProgrammList.sql {
 
 
             bool result = command.ExecuteReader().Read();
-
+            Close();
             return result;
         }
 
         public void CheckTableExists() {
+            Open();
             var command = sqlitecon.CreateCommand();
             command.CommandText = @"SELECT name FROM sqlite_master WHERE type='table' AND name='list';";
             var name = command.ExecuteScalar();
@@ -64,10 +66,12 @@ namespace ProgrammList.sql {
             cols = cols + " Varchar";
             command.CommandText = "CREATE TABLE list (" + cols + ")";
             command.ExecuteNonQuery();
+            Close();
         }
 
 
         public void InsertData(Dictionary<string, string> valuesqlCommand) {
+            Open();
             var transaction = sqlitecon.BeginTransaction();
 
             string result = "";
@@ -88,6 +92,7 @@ namespace ProgrammList.sql {
             Console.WriteLine(sqlCommand);
             command.ExecuteNonQuery();
             transaction.Commit();
+            Close();
         }
 
         public void InsertOrUpdateData(Dictionary<string, string> value) {
@@ -104,13 +109,16 @@ namespace ProgrammList.sql {
         }
 
         public void DeleteOldData(string hostname) {
+            Open();
             var command = sqlitecon.CreateCommand();
             string sqlCommand = @"delete from list where PCID = '" + hostname + "';";
             command.CommandText = sqlCommand;
             command.ExecuteReader();
+            Close();
         }
 
         public void UpdateData(Dictionary<string, string> value) {
+            Open();
             var transaction = sqlitecon.BeginTransaction();
             string sqlCommand = @"Update list ";
 
@@ -139,9 +147,11 @@ namespace ProgrammList.sql {
             Console.WriteLine(command.CommandText);
             command.ExecuteNonQuery();
             transaction.Commit();
+            Close();
         }
 
         public void DeleteData(string id) {
+            Open();
             var command = sqlitecon.CreateCommand();
             command.CommandText = @"SELECT name FROM user WHERE id = $id";
             command.Parameters.AddWithValue("$id", id);
@@ -151,6 +161,7 @@ namespace ProgrammList.sql {
                     var name = reader.GetString(0);
                 }
             }
+            Close();
         }
 
     }
