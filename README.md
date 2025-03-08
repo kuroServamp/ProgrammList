@@ -1,3 +1,8 @@
+Curreently updates to this repo near daily (2025 March 9)
+If there is something acute please add it into the issue section
+ -- de -- Updates hier werden fast täglich gemacht momentan (2025 März 9)
+Falls was konkretes is einfach in die Issues reinpacken
+
 # ProgrammList (EN)
 
 A Program to create a list of programs installled on a system. You may add this program on a networkfolder to get more information from single clients that execute a script to invoke it and save the data to a centralized database.
