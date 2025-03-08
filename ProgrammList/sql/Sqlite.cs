@@ -31,14 +31,11 @@ namespace ProgrammList.sql {
         public Sqlite(string prm_path) {
             string setting = ConfigManager.PrmListConfigManager.GetSetting("filename");
             if (setting != null && setting != "") {
-                Console.WriteLine("using db filename " + setting);
                 sqlitecon = new SqliteConnection("Data Source=" + prm_path + setting);
             }
             else {
-                Console.WriteLine("reverting to default db, sqlite filename sqlite.db");
                 sqlitecon = new SqliteConnection("Data Source=" + prm_path + "sqlite.db");
             }
-            sqlitecon.Open();
         }
 
         public bool GetSingleLine(string pcid, string program, string version) {
@@ -89,7 +86,6 @@ namespace ProgrammList.sql {
             string sqlCommand = "INSERT INTO list(" + cols + ")" + "VALUES(" + result + ")";
             SqliteConnection con;
             var command = new SqliteCommand(sqlCommand, sqlitecon, transaction);
-            Console.WriteLine(sqlCommand);
             command.ExecuteNonQuery();
             transaction.Commit();
             Close();
@@ -97,13 +93,10 @@ namespace ProgrammList.sql {
 
         public void InsertOrUpdateData(Dictionary<string, string> value) {
             if (GetSingleLine(value.GetValueOrDefault("PCID"), value.GetValueOrDefault("DisplayName"), value.GetValueOrDefault("DisplayVersion"))) {
-
-                Console.WriteLine("Update");
                 UpdateData(value);
             }
             else {
 
-                Console.WriteLine("Insert");
                 InsertData(value);
             }
         }
@@ -144,7 +137,6 @@ namespace ProgrammList.sql {
                 }
             }
 
-            Console.WriteLine(command.CommandText);
             command.ExecuteNonQuery();
             transaction.Commit();
             Close();

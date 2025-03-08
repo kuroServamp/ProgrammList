@@ -7,13 +7,24 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;PrgmList</Configurations>
+    <ApplicationIcon>icons\back-end.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icons\back-end.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="MySql.Data" Version="9.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Data.Sqlite">
+      <HintPath>bin\Release\net6.0\Microsoft.Data.Sqlite.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 

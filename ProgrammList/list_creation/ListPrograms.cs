@@ -13,11 +13,6 @@ namespace ProgrammList.ListPrograms {
 
         internal ListPrograms(string sqlType, params string[] filename) {
             if (sqlType == null) {
-                Console.WriteLine("SQL Database not defined in app.conf, allowed types:");
-                Console.WriteLine("MYSQL");
-                Console.WriteLine("MARIADB");
-                Console.WriteLine("MSSQL");
-                Console.WriteLine("SQLITE");
                 throw new ArgumentNullException();
             }
 
@@ -28,7 +23,6 @@ namespace ProgrammList.ListPrograms {
                 string user = PrmListConfigManager.GetSetting("user");
                 string pw = PrmListConfigManager.GetSetting("pw");
                 sql = new Mysql(server, database, user, pw);
-                sqlname = "MySQL/MariaDB";
             }
             else if (sqlType.Equals("MSSQL", StringComparison.OrdinalIgnoreCase)) {
                 string server = PrmListConfigManager.GetSetting("server");
@@ -36,19 +30,14 @@ namespace ProgrammList.ListPrograms {
                 string user = PrmListConfigManager.GetSetting("user");
                 string pw = PrmListConfigManager.GetSetting("pw");
                 sql = new Mssql(server, user, pw, database);
-                sqlname = "MSSQL";
             }
             else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase) && filename != null) {
                 sql = new Sqlite(prgm_path, filename[0]);
-                sqlname = "SQLITE";
             }
             else {
                 // Default sqlite im gleichen ordner
-                sql = new Sqlite(prgm_path, "sqllite.db");
-                sqlname = "fallback default SQLITE";
+                sql = new Sqlite(Directory.GetCurrentDirectory() + "\\sqllite.db");
             }
-
-            Console.WriteLine();
         }
 
         internal void DeleteOldData() {
