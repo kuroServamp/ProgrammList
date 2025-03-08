@@ -12,12 +12,12 @@ namespace ProgrammList.sql {
 
 
         //private static Dbconnection instance;
-        public Mssql() {
+        public Mssql(String server, string user, string pw, string db) {
             builder = new SqlConnectionStringBuilder {
-                DataSource = "localhost",
-                UserID = "sa",
-                Password = "2677890E23",
-                InitialCatalog = "prgmlist",
+                DataSource = server,
+                UserID = user,
+                Password = pw,
+                InitialCatalog = db,
                 TrustServerCertificate = true
             };
         }

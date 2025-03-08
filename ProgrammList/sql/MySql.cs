@@ -8,8 +8,8 @@ namespace ProgrammList.sql {
         public string connstring = null;
         public MySqlConnection mysqlcon = null;
 
-        public Mysql() {
-            connstring = string.Format("Server={0}; database={1}; UID={2}; password={3}", "localhost", "programlist", "prgmlist", "XFdtYdXgahU3U1a73cs5");
+        public Mysql(String server, String db, String user, String pw) {
+            connstring = string.Format("Server={0}; database={1}; UID={2}; password={3}", server, db, user, pw);
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ProgrammList.ConfigManager;
 using ProgrammList.sql;
 using System.Net;
 
@@ -22,11 +23,19 @@ namespace ProgrammList.ListPrograms {
 
             string sqlname = "";
             if (sqlType.Equals("MYSQL", StringComparison.OrdinalIgnoreCase) || sqlType.Equals("MARIADB", StringComparison.OrdinalIgnoreCase)) {
-                sql = new Mysql();
+                string server = PrmListConfigManager.GetSetting("server");
+                string database = PrmListConfigManager.GetSetting("DB");
+                string user = PrmListConfigManager.GetSetting("user");
+                string pw = PrmListConfigManager.GetSetting("pw");
+                sql = new Mysql(server, database, user, pw);
                 sqlname = "MySQL/MariaDB";
             }
             else if (sqlType.Equals("MSSQL", StringComparison.OrdinalIgnoreCase)) {
-                sql = new Mssql();
+                string server = PrmListConfigManager.GetSetting("server");
+                string database = PrmListConfigManager.GetSetting("DB");
+                string user = PrmListConfigManager.GetSetting("user");
+                string pw = PrmListConfigManager.GetSetting("pw");
+                sql = new Mssql(server, user, pw, database);
                 sqlname = "MSSQL";
             }
             else if (sqlType.Equals("SQLITE", StringComparison.OrdinalIgnoreCase) && filename != null) {

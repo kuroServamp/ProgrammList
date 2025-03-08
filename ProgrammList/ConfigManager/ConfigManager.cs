@@ -10,14 +10,12 @@ namespace ProgrammList.ConfigManager {
                     return "";
                 }
                 ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
-                Console.WriteLine("Loading " + Directory.GetCurrentDirectory() + "\\app.conf");
                 configMap.ExeConfigFilename = Directory.GetCurrentDirectory() + "\\app.conf";
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
                 return config.AppSettings.Settings[key].Value;
             }
             catch (Exception e) {
-                Console.WriteLine("Error on Key " + key + ": " + e.ToString());
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Error on Key \"" + key + "\": Key not set");
                 System.Environment.Exit(13);
             }
             return "13";
