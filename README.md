@@ -1,10 +1,10 @@
-Currently updates to this repo near daily (2025 March 9)
+Currently updates to this repo are near daily (2025 March 9)
 
-If there is something acute please add it into the issue section
+If there is something acute please add it into the issue bin
 
  -- de -- Updates hier werden fast täglich gemacht momentan (2025 März 9)
  
-Falls was konkretes is einfach in die Issues reinpacken
+Falls was konkretes is, einfach in die Issues reinpacken
 
 # ProgrammList (EN)
 
