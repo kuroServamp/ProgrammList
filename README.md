@@ -1,4 +1,4 @@
-Curreently updates to this repo near daily (2025 March 9)
+Currently updates to this repo near daily (2025 March 9)
 
 If there is something acute please add it into the issue section
 
