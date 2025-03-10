@@ -1,11 +1,3 @@
-Currently updates to this repo are near daily (2025 March 9)
-
-If there is something acute please add it into the issue bin
-
- -- de -- Updates hier werden fast täglich gemacht momentan (2025 März 9)
- 
-Falls was konkretes is, einfach in die Issues reinpacken
-
 # ProgrammList (EN)
 
 A Program to create a list of programs installled on a system. You may add this program on a networkfolder to get more information from single clients that execute a script to invoke it and save the data to a centralized database.
@@ -13,7 +5,7 @@ A Program to create a list of programs installled on a system. You may add this 
 Supported databases are MSSQL, Sqlite and MySql.
 
 For Sqlite a database file will be created as long as the parameter for it is in the coresponding app.conf file. The app.conf file has to be in the same folder as the .exe file.
-For MSSQL and MySql standard parameters are used currently such as IP (localhost) and Port.
+For MSSQL and MySql additional Parameters are needed in the app.conf.
 
 In later versions this should be made configurable through the app.conf file.
 
@@ -29,7 +21,7 @@ Ein Programm zum erstellen einer Liste installierter Programme auf einem Rechner
 Untersützt werden bisher Speichermethoden in MSSQL, Sqlite und MySql.
 
 Für Sqlite wird eine Dantenbankdatei über eine app.conf date erstellt. Die app.conf Datei muss sich dazu im gleichen Ordner wie die exe befinden.
-Für MSSQL und MySql werden bisher Standard Parameter für IP (Localhost) und Port verwendet.
+Für MSSQL und MySql werden zusätzliche parameter in der app.config benötigt.
 
 In Späteren Versionen sollte dies auch über das Config file editierbar sein.
 
